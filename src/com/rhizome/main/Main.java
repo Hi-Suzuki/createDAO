@@ -3,11 +3,8 @@ package com.rhizome.main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import com.rhizome.dao.EmployeeDAO;
 
 public class Main {
 	public static void main(String[] args) {
@@ -76,81 +73,21 @@ public class Main {
 					//********************************
 					case "1":
 					case "2":
-						// 【1 or 2】の判定
-						boolean flgOne = "1".equals(line);
-						Connection con = null;
-						try {
-							// 検索することが決まったら、DB接続用のJDBCドライバ読み込み
-							Class.forName("org.gjt.mm.mysql.Driver");
-
-							// Connectionの生成
-							con = DriverManager.getConnection(
-									  "jdbc:mysql://127.0.0.1:3306/rezodb"
-									, "rezouser"
-									, "rezo");
-
-							// SQLを決定（１、２で変わる）
-							String sql = "";
-							if (flgOne) {
-								sql = "SELECT * FROM employee";
-							} else {
-								sql = "SELECT * FROM employee WHERE nm_employee LIKE ?";
-							}
-
-							// PreparedStatementの生成
-							PreparedStatement stmt = con.prepareStatement(sql);
-
-							// 処理の分岐：【2】が選択されている場合
-							if (flgOne == false) {
-								// 条件の入力
-								System.out.println("\n検索したい名前を入力してください");
-								try {
-									line = reader.readLine();
-								} catch(IOException e) {
-									throw new Exception("ERROR:0003", e);
-								}
-
-								// 条件をSQLに加える
-								stmt.setString(1, "%" + line + "%");
-							}
-
-							// SQLの実行
-							ResultSet rs = stmt.executeQuery();
-
-							// 実行結果の判定
-							if (rs.next()) {
-								System.out.println("*********検索結果*********");
-								System.out.println("社員ID\t社員名\tフリガナ\tMail\tパスワード\t部署ID");
-								System.out.print(rs.getInt("id_employee"));
-								System.out.print("\t" + rs.getString("nm_employee"));
-								System.out.print("\t" + rs.getString("kn_employee"));
-								System.out.print("\t" + rs.getString("mail_address"));
-								System.out.print("\t" + rs.getString("password"));
-								System.out.print("\t" + rs.getInt("id_department"));
-								System.out.println();
-								// 2件目以降はループ
-								while(rs.next()) {
-									System.out.print(rs.getInt("id_employee"));
-									System.out.print("\t" + rs.getString("nm_employee"));
-									System.out.print("\t" + rs.getString("kn_employee"));
-									System.out.print("\t" + rs.getString("mail_address"));
-									System.out.print("\t" + rs.getString("password"));
-									System.out.print("\t" + rs.getInt("id_department"));
-									System.out.println();
-								}
-							}
-
-							// PreparedStatementの切断
-							stmt.close();
-						} catch(SQLException e) {
-							System.out.println("DB連携でエラーが発生しました");
-							e.printStackTrace();
-						} finally {
-							// Connectionの切断
-							if (con != null) {
-								con.close();
+						// 【2】ならば、条件入力
+						// 条件の入力
+						String name = null;
+						if ("2".equals(line)) {
+							System.out.println("\n検索したい名前を入力してください");
+							try {
+								name = reader.readLine();
+							} catch(IOException e) {
+								throw new Exception("ERROR:0003", e);
 							}
 						}
+
+						// DAOの呼び出し
+						EmployeeDAO dao = new EmployeeDAO();
+						dao.selectByParam(name);
 						break;
 					default:
 						System.out.println("1-2を選択してください！");
