@@ -5,6 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
+import com.rhizome.dto.Employee;
 
 /**
  * employeeテーブル用DAO
@@ -12,9 +15,10 @@ import java.sql.SQLException;
  *
  */
 public class EmployeeDAO {
-	public void selectByParam(String name) throws SQLException {
+	public ArrayList<Employee> selectByParam(String name) throws SQLException {
 		// 仮引数nameに値が入っているか判定
 		boolean flgEmpty = (name == null || "".equals(name));
+		ArrayList<Employee> aryEmployee = null;
 		Connection con = null;
 
 		try {
@@ -46,27 +50,17 @@ public class EmployeeDAO {
 			// 検索の実行
 			ResultSet rs = stmt.executeQuery();
 
-			// 実行結果の判定
-			if (rs.next()) {
-				System.out.println("*********検索結果*********");
-				System.out.println("社員ID\t社員名\tフリガナ\tMail\tパスワード\t部署ID");
-				System.out.print(rs.getInt("id_employee"));
-				System.out.print("\t" + rs.getString("nm_employee"));
-				System.out.print("\t" + rs.getString("kn_employee"));
-				System.out.print("\t" + rs.getString("mail_address"));
-				System.out.print("\t" + rs.getString("password"));
-				System.out.print("\t" + rs.getInt("id_department"));
-				System.out.println();
-				// 2件目以降はループ
-				while(rs.next()) {
-					System.out.print(rs.getInt("id_employee"));
-					System.out.print("\t" + rs.getString("nm_employee"));
-					System.out.print("\t" + rs.getString("kn_employee"));
-					System.out.print("\t" + rs.getString("mail_address"));
-					System.out.print("\t" + rs.getString("password"));
-					System.out.print("\t" + rs.getInt("id_department"));
-					System.out.println();
-				}
+			// 実行結果の格納
+			aryEmployee = new ArrayList<>();
+			while(rs.next()) {
+				Employee emp = new Employee();
+				emp.setIdEmployee(rs.getInt("id_employee"));
+				emp.setNmEmployee(rs.getString("nm_employee"));
+				emp.setKnEmployee(rs.getString("kn_employee"));
+				emp.setMail(rs.getString("mail_address"));
+				emp.setPassword(rs.getString("password"));
+				emp.setIdDepartment(rs.getInt("id_department"));
+				aryEmployee.add(emp);
 			}
 
 			// PreparedStatementの切断
@@ -80,5 +74,7 @@ public class EmployeeDAO {
 				con.close();
 			}
 		}
+
+		return aryEmployee;
 	}
 }

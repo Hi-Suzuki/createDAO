@@ -3,8 +3,10 @@ package com.rhizome.main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import com.rhizome.dao.EmployeeDAO;
+import com.rhizome.dto.Employee;
 
 public class Main {
 	public static void main(String[] args) {
@@ -87,7 +89,23 @@ public class Main {
 
 						// DAOの呼び出し
 						EmployeeDAO dao = new EmployeeDAO();
-						dao.selectByParam(name);
+						ArrayList<Employee> aryEmployee = dao.selectByParam(name);
+
+						// 結果表示
+						if (aryEmployee != null && aryEmployee.size() > 0) {
+							System.out.println("*********検索結果*********");
+							System.out.println("社員ID\t社員名\tフリガナ\tMail\tパスワード\t部署ID");
+							for (Employee emp : aryEmployee) {
+								System.out.print(emp.getIdEmployee());
+								System.out.print("\t" + emp.getNmEmployee());
+								System.out.print("\t" + emp.getKnEmployee());
+								System.out.print("\t" + emp.getMail());
+								System.out.print("\t" + emp.getPassword());
+								System.out.print("\t" + emp.getIdDepartment());
+								System.out.println();
+							}
+						}
+
 						break;
 					default:
 						System.out.println("1-2を選択してください！");
