@@ -1,13 +1,13 @@
 package com.rhizome.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.rhizome.dto.Employee;
+import com.rhizome.util.DBUtil;
 
 /**
  * employeeテーブル用DAO
@@ -22,14 +22,8 @@ public class EmployeeDAO {
 		Connection con = null;
 
 		try {
-			// JDBCドライバの読み込み
-			Class.forName("org.gjt.mm.mysql.Driver");
-
 			// Connectionの生成
-			con = DriverManager.getConnection(
-					  "jdbc:mysql://127.0.0.1:3306/rezodb"
-					, "rezouser"
-					, "rezo");
+			con = DBUtil.getConnection();
 
 			// SQLの生成
 			StringBuffer strSQL = new StringBuffer("SELECT * FROM employee ");
@@ -70,9 +64,7 @@ public class EmployeeDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (con != null) {
-				con.close();
-			}
+			DBUtil.closeConnection(con);
 		}
 
 		return aryEmployee;
